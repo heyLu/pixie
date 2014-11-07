@@ -8,6 +8,7 @@ import pixie.vm.symbol as symbol
 import pixie.vm.code as code
 from pixie.vm.keyword import Keyword, keyword
 from pixie.vm.string import String
+from pixie.vm.regex import Regex
 from pixie.vm.atom import Atom
 import pixie.vm.stdlib as proto
 from rpython.rlib.rarithmetic import r_uint
@@ -392,6 +393,10 @@ def compile_form(form, ctx):
         return
 
     if isinstance(form, String):
+        ctx.push_const(form)
+        return
+
+    if isinstance(form, Regex):
         ctx.push_const(form)
         return
 

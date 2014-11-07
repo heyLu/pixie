@@ -11,6 +11,7 @@ import pixie.vm.rt as rt
 from pixie.vm.persistent_vector import EMPTY as EMPTY_VECTOR
 from pixie.vm.libs.readline import _readline
 from pixie.vm.string import String
+from pixie.vm.regex import Regex
 from pixie.vm.code import wrap_fn, extend
 from pixie.vm.persistent_hash_map import EMPTY as EMPTY_MAP
 from pixie.vm.persistent_hash_set import EMPTY as EMPTY_SET
@@ -393,8 +394,23 @@ class SetReader(ReaderHandler):
             rdr.unread(ch)
             acc = acc.conj(read(rdr, True))
 
+class RegexReader(ReaderHandler):
+    def invoke(self, rdr, ch):
+        acc = []
+
+        while True:
+            try:
+                v = rdr.read()
+            except EOFError:
+                raise Exception("unmatched quote")
+            if v == "\"":
+                return Regex(rt.wrap(u"".join(acc)))
+
+            acc.append(v)
+
 dispatch_handlers = {
-    u"{":  SetReader()
+    u"{": SetReader(),
+    u"\"": RegexReader(),
 }
 
 class DispatchReader(ReaderHandler):
