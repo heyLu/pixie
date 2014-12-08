@@ -70,6 +70,8 @@ def get_native_size(tp):
         return rffi.sizeof(rffi.LONG)
     if tp == String._type:
         return rffi.sizeof(rffi.CCHARP)
+    if tp == FFIOpaque._type:
+        return rffi.sizeof(rffi.VOIDP)
     assert False
 
 def get_ret_val(ptr, tp):
@@ -83,8 +85,21 @@ def get_ret_val(ptr, tp):
             return nil
         else:
             return String(unicode(rffi.charp2str(pnt[0])))
+    if tp == FFIOpaque._type:
+        return FFIOpaque(ptr)
 
     assert False
+
+class FFIOpaque(object.Object):
+    _type = object.Type(u"pixie.stdlib.FFIOpaque")
+
+    def __init__(self, opaque_val):
+        self._opaque_val = opaque_val
+
+    def type(self):
+        return FFIOpaque._type
+
+
 
 def set_native_value(ptr, val, tp):
     if tp is Integer._type:
@@ -95,6 +110,10 @@ def set_native_value(ptr, val, tp):
         pnt = rffi.cast(rffi.CCHARPP, ptr)
         pnt[0] = rffi.str2charp(str(rt.name(val)))
         return rffi.cast(rffi.CCHARP, rffi.ptradd(pnt, rffi.sizeof(rffi.CCHARP)))
+    if tp is FFIOpaque._type:
+        pnt = rffi.cast(rffi.VOIDP, ptr)
+        pnt[0] = val._opaque_val
+        return rffi.cast(rffi.CCHARP, rffi.ptradd(pnt, rffi.sizeof(val._opaque_val)))
     assert False
 
 class FFIFn(object.Object):
@@ -195,6 +214,8 @@ def get_clibffi_type(arg):
     if arg == Integer._type:
         return clibffi.cast_type_to_ffitype(rffi.LONG)
     if arg == String._type:
+        return clibffi.ffi_type_pointer
+    if arg == FFIOpaque._type:
         return clibffi.ffi_type_pointer
     assert False
 
