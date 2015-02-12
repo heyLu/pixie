@@ -624,6 +624,15 @@ returns true"
   [n]
   (= (rem n 2) 1))
 
+(defn nth
+  [coll idx]
+  (if (>= idx 0)
+    (-nth coll idx)
+    (let [i (+ (count coll) idx)]
+      (if (>= i 0)
+        (-nth coll i)
+        (throw "index out of bounds")))))
+
 (defn first
   {:doc "Returns the first item in coll, if coll implements IIndexed nth will be used to retreive
          the item from the collection."
