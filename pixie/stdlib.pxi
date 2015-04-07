@@ -640,6 +640,12 @@ returns true"
   [coll]
   (if (seq coll) true false))
 
+(defn not-empty
+  {:doc "Returns nil if empty, otherwise coll"
+   :added "0.1"}
+  [coll]
+  (if (seq coll) coll nil))
+
 (defn even?
   {:doc "Returns true if n is even"
    :signatures [[n]]
@@ -829,6 +835,7 @@ If further arguments are passed, invokes the method named by symbol, passing the
 (defn string? [v] (instance? String v))
 (defn keyword? [v] (instance? Keyword v))
 
+(defn coll? [v] (satisfies? IPersistentCollection v))
 (defn list? [v] (instance? [PersistentList Cons] v))
 (defn set? [v] (instance? PersistentHashSet v))
 (defn map? [v] (satisfies? IMap v))
