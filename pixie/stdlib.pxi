@@ -726,6 +726,20 @@ returns true"
   ([m & ks]
     (reduce -dissoc m ks)))
 
+(defn select-keys
+  {:doc "Returns a map containing only those entries in map whose key is in keys"
+   :added "0.1"}
+  [map keys]
+  (loop [ret {}
+         keys (seq keys)]
+    (if keys
+      (let [entry (get map (first keys))]
+        (recur (if (contains? map (first keys))
+                 (assoc ret (first keys) (get map (first keys)))
+                 ret)
+               (next keys)))
+      (with-meta ret (meta map)))))
+
 (defn contains?
   {:doc "Checks if there is a value associated with key in the collection.
 
